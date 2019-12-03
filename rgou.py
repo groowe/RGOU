@@ -287,6 +287,28 @@ def moves():
         turn = 0
     moved = True
 
+def is_move_possible():
+    a = pieces_coords[turn] # all pieces of player who's move it is
+    road = tracks[turn]
+    if turn == 0:
+        opponent = 2
+    else:
+        opponent = 0
+    for piece in a:
+        # where is the piece
+        piece_position = road.index(piece)
+        if rolled + piece_position <= len(road):
+            newcoords = road[piece_position+rolled_num]
+            if newcoords == [3,1]:
+                if newcoords in pieces_coords[opponent]:
+                    newcoords = [4,1]
+            if newcoords not in a:
+                return True
+    return False
+
+
+
+
 def printbuts():
     for a in pieces_coords:
         print(a)
@@ -375,6 +397,22 @@ def score():
 
 def forfeit():
     global moved,rolled , turn
+    if not rolled:
+
+        tk.messagebox.askokcancel("popup","ROLL!")
+        return
+    if pieces_coords[0] == 0:
+        finished(0)
+        return
+    if pieces_coords[2] == 0:
+        finished(2)
+        return
+
+    if rolled and is_move_possible():
+
+
+        tk.messagebox.askokcancel("popup","you can move!")
+        return
     moved = True
     rolled = False
     if turn == 0:
