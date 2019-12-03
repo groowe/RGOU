@@ -183,7 +183,7 @@ def reset():
             for y in range(3):
                 butts(x,y)
 
-        score():
+        score()
 #        checkroll()
 
 
@@ -354,7 +354,7 @@ def board():
 def score():
     w = str(7 - len(pieces_coords[0]))
     b = str(7 - len(pieces_coords[2]))
-    string = "score\n" + w + " : " + b
+    string = f"score\n{w} : {b}"
 
     global board_butts
     if board_butts[8][1] == None:
