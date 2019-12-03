@@ -128,6 +128,12 @@ def roll():
     global rolled_num
     global moved , rolled
 #    rolled_num = 0
+    # check if game did not ended already
+    if not pieces_coords[0] or not pieces_coords[2]:
+
+        game_ended(turn)
+        return
+
     if moved == False or rolled == True:
         return
     i = 0
@@ -200,7 +206,7 @@ def play(x,y):
             return
         checkroll()
         return
-    # elif moving pieces already on board
+    # elif moving pieces
     elif [x,y] in pieces_coords[turn] and not moved:
         if turn == 0:
             opponent = 2
@@ -244,7 +250,8 @@ def play(x,y):
         if [newx,newy] in pieces_coords[opponent]:
             oppindex = pieces_coords[opponent].index([newx,newy])
             pieces_coords[opponent][oppindex] = [4,opponent]
-        if (newx == 0 and (newy == 2 or newy == 0)): # 0,0 and 0,2 are "play again"
+        playagain =[ [0,0] , [0,2] , [3,1] ,[6,0] , [6,2] ] # "play again" squares
+        if [newx,newy] in playagain:
             moved = True
             rolled = False
             s = turn
