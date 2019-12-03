@@ -61,21 +61,14 @@ def rollicon(y): # needed only 0 or 2
         if not moved:
             s+="-active"
     else:
-        s+="wait"
-#        s+="roll"
-#    else:
-#        s+=str(rolled_num)
-#    
-#
-#    if not moved and y == turn:
-#
-#        s+="-active"
+        if rolled_num == 0:
+            s = "0"
+        else:
+            s+="wait"
     print(f"turn: {turn},rolled_num {rolled_num},moved {moved}")
     return s
 
 def checkroll():
-
-#def butts(x,y):
 # rolls
     butts(5,0)
     butts(5,2)
@@ -203,36 +196,10 @@ def play(x,y):
                 turn = 0
             moved = True
             rolled = False
-#            butts(5,2)
-#            butts(5,0)
             checkroll()
             return
         checkroll()
         return
-#        f ,but, p = board_butts[x][y]
-#        but["text"] = str(rolled_num)
-#        print(board_butts[x][y])
-#        board_butts[x][y] = f,but,p
-    # elif startposition of player who is on move,move by roll amount
-#    elif x == 4 and y == turn and not moved: # integrate to normal turn
-#        # check if piece on button
-#        if [x,y] not in pieces_coords[turn]:
-#            return
-#        pieceindex = pieces_coords[turn].index([x,y])
-#
-#        newx,newy = tracks[turn][rolled_num-1]
-#        # check if another piece is not already there
-#        if [newx,newy] in pieces_coords[turn]: # 
-#            return
-#        print(f"rolled_num {rolled_num}")
-#        print(f"x y {x}{y}\nnewx newy {newx}{newy}")
-#        print(f"track : {tracks[turn]}")
-#        print(f"rolled_num , rolled_num - 1 : {rolled_num} {rolled_num-1}")
-#        print(f"track rolled_num : {tracks[turn][rolled_num-1]}")
-#        pieces_coords[turn][pieceindex] = [newx,newy]
-#        butts(x,y)
-#        butts(newx,newy)
-#        printbuts()
     # elif moving pieces already on board
     elif [x,y] in pieces_coords[turn] and not moved:
         if turn == 0:
@@ -260,7 +227,6 @@ def play(x,y):
             
             if not pieces_coords[turn]:
                 game_ended(turn)
-#                return
             butts(x,y)
             turn = opponent
             rolled = False
@@ -268,8 +234,6 @@ def play(x,y):
             checkroll()
             return
         newx,newy = tracks[turn][rolled_num+tableindex]
-#        if [newx,newy] in pieces_coords[turn] : # can't take own piece
-#            return
         # special case
         if [newx,newy] == [3,1] : # can't take piece there
             if [newx,newy] in pieces_coords[opponent]: # go one step further
@@ -298,13 +262,6 @@ def play(x,y):
         checkroll()
         return
 
-#    if not ( x == 5 and (y==0 or y ==2)):
-#        if turn == 0:
-#            turn = 2
-#        else:
-#            turn = 0
-#        print(f"turn {turn}")
-#        print("")
     return
 def moves():
     global turn
