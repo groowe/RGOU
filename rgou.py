@@ -32,8 +32,8 @@ gf.pack()
 #white_piece = white_piece.subsample(2,2)
 board_butts =[[None for i in range(3)] for i in range(9)] # one line more for buttons
 #board_butts.append([None]) # for extra button(s)
-white_pieces_coords = [[4,0] for i in range(6)]
-black_pieces_coords = [[4,2] for i in range(6)]
+white_pieces_coords = [[4,0] for i in range(7)]
+black_pieces_coords = [[4,2] for i in range(7)]
 pieces_coords = [white_pieces_coords,None,black_pieces_coords]
 white_track = [[4,0],[3,0],[2,0],[1,0],[0,0],
         [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],
@@ -159,8 +159,8 @@ def reset():
 
     a = tk.messagebox.askokcancel("popup","reset?")
     if a:
-        white_pieces_coords = [[4,0] for i in range(6)]
-        black_pieces_coords = [[4,2] for i in range(6)]
+        white_pieces_coords = [[4,0] for i in range(7)]
+        black_pieces_coords = [[4,2] for i in range(7)]
         pieces_coords = [white_pieces_coords,None,black_pieces_coords]
         rolled = False
         rolled_num = 0 # number rolled
