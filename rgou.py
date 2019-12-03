@@ -133,6 +133,7 @@ def roll():
     if not pieces_coords[0]:
 
         game_ended(0)
+        return
     elif not pieces_coords[2]:
 
         game_ended(2)
@@ -161,7 +162,7 @@ def game_ended(turn):
     else:
         s = "black"
         opp = 0
-    t = s + f" won  0 : {len(pieces_coords[opp])}"
+    t = s + f" won  7 : {7 - len(pieces_coords[opp])}"
     showinfo("Window",t)
 
 def reset():
@@ -182,6 +183,7 @@ def reset():
             for y in range(3):
                 butts(x,y)
 
+        score():
 #        checkroll()
 
 
@@ -235,7 +237,8 @@ def play(x,y):
             print(f"{pieces_coords[turn] == True}")
 
             print(f"{pieces_coords[turn] == False}")
-            
+            # update score
+            score()
             if not pieces_coords[turn]:
                 game_ended(turn)
             butts(x,y)
@@ -336,7 +339,6 @@ def board():
     b.pack()
     board_butts[8][0] = f,b
     # button for reset
-
     f = tk.Frame(gf,width = 120,height=60)
     f.rowconfigure(0,weight=1)
     f.columnconfigure(0,weight=1)
@@ -345,6 +347,31 @@ def board():
     b = tk.Button(f,text="reset",command = reset)
     b.pack()
     board_butts[8][2] = f,b
+    # score button
+    score()
+
+
+def score():
+    w = str(7 - len(pieces_coords[0]))
+    b = str(7 - len(pieces_coords[2]))
+    string = "score\n" + w + " : " + b
+
+    global board_butts
+    if board_butts[8][1] == None:
+        # score :
+        f = tk.Frame(gf,width = 120,height= 60)
+        f.rowconfigure(0,weight = 1)
+        f.columnconfigure(0,weight=1)
+        f.grid_propagate(0)
+        f.grid(row=8,column=1)
+        b = tk.Button(f,text=string)
+        b.pack()
+        board_butts[8][1] = f,b
+    else:
+        f,b = board_butts[8][1]
+        b["text"] = string
+        board_butts[8][1] =f, b
+
 
 def forfeit():
     global moved,rolled , turn
