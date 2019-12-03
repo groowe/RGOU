@@ -297,7 +297,7 @@ def is_move_possible():
     for piece in a:
         # where is the piece
         piece_position = road.index(piece)
-        if rolled + piece_position <= len(road):
+        if rolled_num + piece_position <= len(road):
             newcoords = road[piece_position+rolled_num]
             if newcoords == [3,1]:
                 if newcoords in pieces_coords[opponent]:
