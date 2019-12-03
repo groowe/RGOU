@@ -128,10 +128,15 @@ def roll():
     global rolled_num
     global moved , rolled
 #    rolled_num = 0
-    # check if game did not ended already
-    if not pieces_coords[0] or not pieces_coords[2]:
 
-        game_ended(turn)
+    # check if game did not ended already
+    if not pieces_coords[0]:
+
+        game_ended(0)
+    elif not pieces_coords[2]:
+
+        game_ended(2)
+
         return
 
     if moved == False or rolled == True:
