@@ -142,15 +142,10 @@ def roll():
 #    rolled_num = 0
 
     # check if game did not ended already
-    if not pieces_coords[0]:
-
-        game_ended(0)
-        return
-    elif not pieces_coords[2]:
-
-        game_ended(2)
-
-        return
+    for i in range(0,3,2):
+        if not pieces_coords[i]:
+            game_ended(i)
+            return
 
     if moved == False or rolled == True:
         return
@@ -160,8 +155,8 @@ def roll():
 #    print(i)
     rolled_num = i
     moved = False
-    if i == 0:
-        moved = True
+#    if i == 0:
+#        moved = True
     rolled = True
     checkroll()
     print(f"rolled_num {rolled_num}")
@@ -184,20 +179,11 @@ def reset():
     a = tk.messagebox.askokcancel("popup","reset?")
     if a:
         setup()
-#        white_pieces_coords = [[4,0] for i in range(7)]
-#        black_pieces_coords = [[4,2] for i in range(7)]
-#        pieces_coords = [white_pieces_coords,None,black_pieces_coords]
-#        rolled = False
-#        rolled_num = 0 # number rolled
-#        turn = 0 # 0 = white 2= black
-#        moved = True # did we move after roll ?
-#        checkroll()
         for x in range(8):
             for y in range(3):
                 butts(x,y)
 
         score()
-#        checkroll()
 
 def endmove(playagain = False): # True == one more move
     global turn,rolled,moved
@@ -211,7 +197,9 @@ def endmove(playagain = False): # True == one more move
     rolled = False
     moved = True
     if playagain:
-        roll()
+        s = roll()
+        if s == 0:
+            endmove()
 
     checkroll()
 
@@ -291,57 +279,26 @@ def play(x,y):
 
         playagain =[ [0,0] , [0,2] , [3,1] ,[6,0] , [6,2] ] # "play again" squares
         butts(x,y)
-#        checkroll()
         butts(newx,newy)
         play = ( [newx,newy] in playagain )
         endmove(play)
-#            moved = True
-#            rolled = False
-#        else:
-#            moved = True
-#            rolled = True
-#            turn = opponent
-#            endmove()
-            
-
-##            return
-####            s = turn
-####            roll()
-####            if rolled_num != 0:
-#####            moved = True
-####                turn = s
-####            else:
-####                if s == 0:
-####                    turn = 2
-####                else:
-####                    turn = 0
-####        else:
-####            moved = True
-####            rolled = False
-        butts(x,y)
-#        checkroll()
-        butts(newx,newy)
-#        checkroll()
         return
     return
 
-def moves():
-    global turn
-    global moved
-    if turn == 0:
-        turn = 2
-    else :
-        turn = 0
-    moved = True
-
 def is_move_possible():
-    a = pieces_coords[turn] # all pieces of player who's move it is
+    a = pieces_coords[turn] # all pieces of player who's move it is 
     road = tracks[turn]
     if turn == 0:
         opponent = 2
     else:
         opponent = 0
+    alreadychecked = []
+#    print(f"checking {a}")
     for piece in a:
+        if piece in alreadychecked:
+            continue
+
+#        print(f"checking {piece} of {turn}")
         # where is the piece
         piece_position = road.index(piece)
         # move is not going way out of board
@@ -353,6 +310,7 @@ def is_move_possible():
             # move wouldn't take own piece
             if newcoords not in a:
                 return True
+        alreadychecked.append(piece)
     return False
 
 # not needed, just for debugging:
