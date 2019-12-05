@@ -1,13 +1,6 @@
 #!/usr/bin/env python
 # Royal Game of Ur
 
-#Equipment
-
-#The game of Royal game of Ur is played on an unusually shaped special board. To understand the shape of the board, f>
-
-#The boards found at Ur have been accompanied by small round counters, each with five white dots on them, seven light>
-
-
 
 import tkinter as tk
 import random
@@ -314,9 +307,10 @@ def is_move_possible():
     return False
 
 # not needed, just for debugging:
-def printbuts():
-    for a in pieces_coords:
-        print(a)
+#def printbuts():
+#
+#    for a in pieces_coords:
+#        print(a)
 ####
 
 def butts(x,y):
@@ -403,12 +397,11 @@ def forfeit():
 
         tk.messagebox.askokcancel("popup","ROLL!")
         return
-    if pieces_coords[0] == 0:
-        finished(0)
-        return
-    if pieces_coords[2] == 0:
-        finished(2)
-        return
+    # check if game did not ended already
+    for i in range(0,3,2):
+        if not pieces_coords[i]:
+            game_ended(i)
+            return
 
     if rolled and is_move_possible():
         tk.messagebox.askokcancel("popup","you can move!")
