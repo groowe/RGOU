@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # Royal Game of Ur
 
-
 import tkinter as tk
 import random
 from tkinter.messagebox import showinfo
@@ -53,15 +52,13 @@ def setup():
     turn = 0 # 0 = white 2= black
     moved = True # did we move after roll ?
 setup()
-def rollicon(y): # needed only 0 or 2
+def rollicon(y): # needed only 0 or 2 | white or black
     s = ""
-
     if turn == y:
         if not rolled:
             s+="roll"
         else:
             s+= str(rolled_num)
-
         if not moved:
             s+="-active"
     else:
@@ -107,12 +104,9 @@ def picbutton(x,y):
     if coords in white_pieces_coords:
         name+="-white"
     elif coords in black_pieces_coords:
-
         name+="-black"
-
     if coords in rolling_icons:
         name = rollicon(y)
-
     if coords == [4,0] or coords == [4,2]:
         if len(pieces_coords[y]) == 0:
             name = "-empty-"
@@ -122,12 +116,10 @@ def picbutton(x,y):
         pic= tk.PhotoImage(file="-empty-.gif")
         pic = pic.subsample(2,2)
         return pic
-
 #    print(name)
     pic= tk.PhotoImage(file=name)
     pic = pic.subsample(2,2)
     return pic
-
 
 def roll():
     global rolled_num
@@ -139,7 +131,6 @@ def roll():
         if not pieces_coords[i]:
             game_ended(i)
             return
-
     if moved == False or rolled == True:
         return
     i = 0
@@ -168,14 +159,12 @@ def game_ended(turn):
 def reset():
     global white_pieces_coords,black_pieces_coords,pieces_coords
     global rolled, rolled_num , turn, moved
-
     a = tk.messagebox.askokcancel("popup","reset?")
     if a:
         setup()
         for x in range(8):
             for y in range(3):
                 butts(x,y)
-
         score()
 
 def endmove(playagain = False): # True == one more move
@@ -253,10 +242,6 @@ def play(x,y):
                 game_ended(turn)
             butts(x,y)
             endmove()
-#            turn = opponent
-#            rolled = False
-#            moved = True
-#            checkroll()
             return
         newx,newy = tracks[turn][rolled_num+tableindex]
         # special case
