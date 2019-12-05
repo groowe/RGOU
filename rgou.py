@@ -30,25 +30,36 @@ gf = tk.Frame(game,width=800,height=800)
 gf.pack()
 #white_piece = tk.PhotoImage(file='white_piece.gif')
 #white_piece = white_piece.subsample(2,2)
-board_butts =[[None for i in range(3)] for i in range(9)] # one line more for buttons
-#board_butts.append([None]) # for extra button(s)
-white_pieces_coords = [[4,0] for i in range(7)]
-black_pieces_coords = [[4,2] for i in range(7)]
-pieces_coords = [white_pieces_coords,None,black_pieces_coords]
-white_track = [[4,0],[3,0],[2,0],[1,0],[0,0],
-        [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],
-        [7,0],[6,0]]
-black_track = [[4,2],[3,2],[2,2],[1,2],[0,2],
-        [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],
-        [7,2],[6,2]]
-common_track = [[1,0],[1,1],[1,2],[1,3],[1,4],[1,5],[1,6],[1,7]]
-tracks = [white_track,None,black_track]
 
-# some variables:
-rolled = False
-rolled_num = 0 # number rolled
-turn = 0 # 0 = white 2= black
-moved = True # did we move after roll ?
+
+board_butts =[[None for i in range(3)] for i in range(9)] # one line more for buttons
+def setup():
+    global white_pieces_coords,black_pieces_coords
+    global pieces_coords
+    global white_track , black_track , common_track
+    global tracks
+    global turn , moved
+    global rolled , rolled_num
+
+    #board_butts.append([None]) # for extra button(s)
+    white_pieces_coords = [[4,0] for i in range(7)]
+    black_pieces_coords = [[4,2] for i in range(7)]
+    pieces_coords = [white_pieces_coords,None,black_pieces_coords]
+    white_track = [[4,0],[3,0],[2,0],[1,0],[0,0],
+            [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],
+            [7,0],[6,0]]
+    black_track = [[4,2],[3,2],[2,2],[1,2],[0,2],
+            [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],
+            [7,2],[6,2]]
+    common_track = [[1,0],[1,1],[1,2],[1,3],[1,4],[1,5],[1,6],[1,7]]
+    tracks = [white_track,None,black_track]
+    
+    # some variables:
+    rolled = False
+    rolled_num = 0 # number rolled
+    turn = 0 # 0 = white 2= black
+    moved = True # did we move after roll ?
+setup()
 def rollicon(y): # needed only 0 or 2
     s = ""
 
@@ -78,6 +89,7 @@ def checkroll():
 
 # coords of icons:
 def picbutton(x,y):
+    global pieces_coords
     name = ""
     wheel_icons = [[0,0],[0,2],[3,1],[6,0],[6,2]]
     bars_icons = [[0,1]]
@@ -171,13 +183,14 @@ def reset():
 
     a = tk.messagebox.askokcancel("popup","reset?")
     if a:
-        white_pieces_coords = [[4,0] for i in range(7)]
-        black_pieces_coords = [[4,2] for i in range(7)]
-        pieces_coords = [white_pieces_coords,None,black_pieces_coords]
-        rolled = False
-        rolled_num = 0 # number rolled
-        turn = 0 # 0 = white 2= black
-        moved = True # did we move after roll ?
+        setup()
+#        white_pieces_coords = [[4,0] for i in range(7)]
+#        black_pieces_coords = [[4,2] for i in range(7)]
+#        pieces_coords = [white_pieces_coords,None,black_pieces_coords]
+#        rolled = False
+#        rolled_num = 0 # number rolled
+#        turn = 0 # 0 = white 2= black
+#        moved = True # did we move after roll ?
 #        checkroll()
         for x in range(8):
             for y in range(3):
@@ -186,6 +199,21 @@ def reset():
         score()
 #        checkroll()
 
+def endmove(playagain = False): # True == one more move
+    global turn,rolled,moved
+    if turn == 0:
+        opponent = 2
+    else:
+        opponent = 0
+
+    if not playagain:
+        turn = opponent
+    rolled = False
+    moved = True
+    if playagain:
+        roll()
+
+    checkroll()
 
 def play(x,y):
     global white_pieces_coords
@@ -193,6 +221,7 @@ def play(x,y):
     global pieces_coords , board_butts
     global rolled_num , turn ,moved , rolled
 
+#    setup()
     checkroll()
     print(f"{x},{y} pressed\nturn {turn}\nrolled_num {rolled_num}")
 #    rolled_num = 0
@@ -242,10 +271,11 @@ def play(x,y):
             if not pieces_coords[turn]:
                 game_ended(turn)
             butts(x,y)
-            turn = opponent
-            rolled = False
-            moved = True
-            checkroll()
+            endmove()
+#            turn = opponent
+#            rolled = False
+#            moved = True
+#            checkroll()
             return
         newx,newy = tracks[turn][rolled_num+tableindex]
         # special case
@@ -258,26 +288,43 @@ def play(x,y):
         if [newx,newy] in pieces_coords[opponent]:
             oppindex = pieces_coords[opponent].index([newx,newy])
             pieces_coords[opponent][oppindex] = [4,opponent]
+
         playagain =[ [0,0] , [0,2] , [3,1] ,[6,0] , [6,2] ] # "play again" squares
-        if [newx,newy] in playagain:
-            moved = True
-            rolled = False
-            s = turn
-            roll()
-            if rolled_num != 0:
-#            moved = True
-                turn = s
-        else:
-            moved = True
-            rolled = False
-            turn = opponent
         butts(x,y)
 #        checkroll()
         butts(newx,newy)
-        checkroll()
-        return
+        play = ( [newx,newy] in playagain )
+        endmove(play)
+#            moved = True
+#            rolled = False
+#        else:
+#            moved = True
+#            rolled = True
+#            turn = opponent
+#            endmove()
+            
 
+##            return
+####            s = turn
+####            roll()
+####            if rolled_num != 0:
+#####            moved = True
+####                turn = s
+####            else:
+####                if s == 0:
+####                    turn = 2
+####                else:
+####                    turn = 0
+####        else:
+####            moved = True
+####            rolled = False
+        butts(x,y)
+#        checkroll()
+        butts(newx,newy)
+#        checkroll()
+        return
     return
+
 def moves():
     global turn
     global moved
@@ -297,21 +344,22 @@ def is_move_possible():
     for piece in a:
         # where is the piece
         piece_position = road.index(piece)
+        # move is not going way out of board
         if rolled_num + piece_position <= len(road):
             newcoords = road[piece_position+rolled_num]
-            if newcoords == [3,1]:
+            if newcoords == [3,1]: # special square check
                 if newcoords in pieces_coords[opponent]:
                     newcoords = [4,1]
+            # move wouldn't take own piece
             if newcoords not in a:
                 return True
     return False
 
-
-
-
+# not needed, just for debugging:
 def printbuts():
     for a in pieces_coords:
         print(a)
+####
 
 def butts(x,y):
 #    print(f"butts {x}{y}")
@@ -343,11 +391,9 @@ def board():
 #                print(b)
                 if picture:
                     b = tk.Button(f,image=picture)
-    
                 else:
                     b = tk.Button(f,text="roll")
                 b["command"] = lambda *args,a=x,c=y: play(a,c)
-
                 b.pack()
 #                print(f"{x}{y}")
                 board_butts[x][y] = f,b,picture
@@ -372,12 +418,10 @@ def board():
     # score button
     score()
 
-
 def score():
     w = str(7 - len(pieces_coords[0]))
     b = str(7 - len(pieces_coords[2]))
     string = f"score\n{w} : {b}"
-
     global board_butts
     if board_butts[8][1] == None:
         # score :
@@ -389,7 +433,7 @@ def score():
         b = tk.Button(f,text=string)
         b.pack()
         board_butts[8][1] = f,b
-    else:
+    else: # update
         f,b = board_butts[8][1]
         b["text"] = string
         board_butts[8][1] =f, b
@@ -409,8 +453,6 @@ def forfeit():
         return
 
     if rolled and is_move_possible():
-
-
         tk.messagebox.askokcancel("popup","you can move!")
         return
     moved = True
