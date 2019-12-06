@@ -7,7 +7,21 @@ from tkinter.messagebox import showinfo
 
 game = tk.Tk()
 game.title("RGOU")
-gf = tk.Frame(game,width=800,height=800)
+
+#####  TEST #####
+#fname = "RGOU.gif"
+#bg_image = tk.PhotoImage(file=fname)
+#bg_image = bg_image.subsample(2,2)
+#w = bg_image.width()
+#h = bg_image.height()
+#game.geometry("%dx%d+50+30" % (w,h))
+#cv = tk.Canvas(width=w,height=h)
+#cv.pack(side='top',fill='both',expand='yes')
+#cv.create_image(0,0,image=bg_image,anchor='nw')
+#
+#gf = cv
+#################
+#gf = tk.Frame(game,width=800,height=800)
 ### background : TBD
 #rgou = tk.PhotoImage(file='RGOU.gif')
 #rgou = rgou.subsample(2,2)
@@ -153,7 +167,7 @@ def game_ended(turn):
     else:
         s = "black"
         opp = 0
-    t = s + f" won  7 : {7 - len(pieces_coords[opp])}"
+    t = f"{s} won  7 : {7 - len(pieces_coords[opp])}"
     showinfo("Window",t)
 
 def reset():
@@ -391,14 +405,15 @@ def forfeit():
     if rolled and is_move_possible():
         tk.messagebox.askokcancel("popup","you can move!")
         return
-    moved = True
-    rolled = False
-    if turn == 0:
-        turn = 2
-    else:
-        turn = 0
-    
-    checkroll()
+    endmove()
+#    moved = True
+#    rolled = False
+#    if turn == 0:
+#        turn = 2
+#    else:
+#        turn = 0
+#    
+#    checkroll()
 
 board()
 game.mainloop()
