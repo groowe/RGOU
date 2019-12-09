@@ -113,18 +113,23 @@ rollicons = []
 
 def rollicon(y): # 0 white , 2 black
     s = ""
+    if turn == 2:
+        dd = "-black"
+    else:
+        dd = "-white"
     if turn == y:
+        s+=dd
         if not rolled:
             s+="roll"
         else:
             s+= str(rolled_num)
-        if not moved:
-            s+="-active"
+#        if not moved:
+#            s+="-active"
     else:
         if rolled_num == 0:
             s = "0"
         else:
-            s+="wait"
+            s="wait"
     s+=".gif"
     pc = tk.PhotoImage(file=s)
     pc = pc.subsample(2,2)
