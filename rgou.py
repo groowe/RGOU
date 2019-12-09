@@ -1,164 +1,242 @@
 #!/usr/bin/env python
 # Royal Game of Ur
+try:
+    # python2
+    import Tkinter as tk
+    from Tkinter.messagebox import showinfo
+except ImportError:
+    # python3
+    import tkinter as tk
+    from tkinter.messagebox import showinfo
+import random # for rolls
 
-import tkinter as tk
-import random
-from tkinter.messagebox import showinfo
+def callback(event):
+    print("clicked at", event.x, event.y)
+
+    coords(event.x,event.y)
+#    coordss(event.x,event.y)
+
+
+
+#frame = Frame(game, width=100, height=100)
+
+
+#game.mainloop()
 
 game = tk.Tk()
-game.title("RGOU")
+game.title("Royal Game of Ur")
+## BG image
+fname = "RGOU.gif"
+bg_image = tk.PhotoImage(file=fname)
+bg_image = bg_image.subsample(2,2)
+w = bg_image.width()
+h = bg_image.height()
+strs = "%dx%d+50+30" % (w,h)
+print(strs)
+game.geometry(strs)
+cv = tk.Canvas(width=w,height=h)
+cv.pack(side='top',fill='both',expand='yes')
+cv.create_image(0,0,image=bg_image,anchor='nw')
+cv.bind("<Button-1>", callback)
+cv.pack()
+print(dir(cv))
+board_x_y = [ # x ,y ,xn,yn,[xycoordinates]
+        [100,80,180,152,[0,0]],
+        [100,170,180,231,[1,0]],
 
-#####  TEST #####
-#fname = "RGOU.gif"
-#bg_image = tk.PhotoImage(file=fname)
-#bg_image = bg_image.subsample(2,2)
-#w = bg_image.width()
-#h = bg_image.height()
-#game.geometry("%dx%d+50+30" % (w,h))
-#cv = tk.Canvas(width=w,height=h)
-#cv.pack(side='top',fill='both',expand='yes')
-#cv.create_image(0,0,image=bg_image,anchor='nw')
-#
-#gf = cv
-#################
-#gf = tk.Frame(game,width=800,height=800)
-### background : TBD
-#rgou = tk.PhotoImage(file='RGOU.gif')
-#rgou = rgou.subsample(2,2)
-#rgou_label = tk.Label(gf,image=rgou)
-#rgou_label.place(x=-73,y=50,relwidth=1,relheight=1)
-#######
-#f = tk.Frame(gf,width=100,height=100)
-#f.columnconfigure(0,weight=1)
-#f.rowconfigure(0,weight=1)
-#f.grid_propagate(0)
+        [100,245,180,315,[2,0]],
+        [100,325,180,394,[3,0]],
+        [20,332,69,386,[4,0]], # white start
 
-gf.pack()
-#white_piece = tk.PhotoImage(file='white_piece.gif')
-#white_piece = white_piece.subsample(2,2)
+        [60,443,142,517,[5,0]], # roll white
+        [100,578,180,635,[6,0]],
+        [100,650,180,719,[7,0]],
 
 
-board_butts =[[None for i in range(3)] for i in range(9)] # one line more for buttons
+#    w = cv.create_image(100,480,image=whiterollicon)
+#        [270,489,338,560,[5,2]], # roll black
+#        [287,428,338,560,[5,2]], # roll black
+#    b = cv.create_image(330,480,image=blackrollicon)
+
+        [189,80,257,152,[0,1]],
+        [189,170,257,231,[1,1]],
+        [189,239,257,315,[2,1]],
+        [189,325,257,394,[3,1]],
+        [189,403,257,478,[4,1]],
+        [189,489,257,560,[5,1]],
+        [189,578,257,635,[6,1]],
+        [189,650,257,719,[7,1]],
+
+        [270,80,338,152,[0,2]],
+        [270,170,338,231,[1,2]],
+        [270,245,338,315,[2,2]],
+        [270,325,338,394,[3,2]],
+        [365,319,445,396,[4,2]], # black start
+        [293,446,368,517,[5,2]], # roll black
+        [270,578,338,635,[6,2]],
+        [270,650,338,719,[7,2]]
+
+        ]
+
 def setup():
-    global white_pieces_coords,black_pieces_coords
-    global pieces_coords
-    global white_track , black_track , common_track
+    global white_pieces, black_pieces
+    global pieces
+    global white_track, black_track
     global tracks
-    global turn , moved
-    global rolled , rolled_num
-
-    #board_butts.append([None]) # for extra button(s)
-    white_pieces_coords = [[4,0] for i in range(7)]
-    black_pieces_coords = [[4,2] for i in range(7)]
-    pieces_coords = [white_pieces_coords,None,black_pieces_coords]
+    global turn , rolled_num, moved , rolled
+    rolled = False 
+    moved = True # did we move after roll?
+    turn = 0 # 0 = white , 2 = black
+    rolled_num = 0 # number rolled
+    white_pieces = [[4,0] for i in range(7)] # score white
+    black_pieces = [[4,2] for i in range(7)]
+    pieces =  [white_pieces,None,black_pieces]
     white_track = [[4,0],[3,0],[2,0],[1,0],[0,0],
-            [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],
-            [7,0],[6,0]]
+                   [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],
+                   [7,0],[6,0]]
     black_track = [[4,2],[3,2],[2,2],[1,2],[0,2],
-            [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],
-            [7,2],[6,2]]
-    common_track = [[1,0],[1,1],[1,2],[1,3],[1,4],[1,5],[1,6],[1,7]]
+                   [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],
+               [7,2],[6,2]]
+    # common_track = [[1,0],[1,1],[1,2],[1,3],[1,4],[1,5],[1,6],[1,7]]
     tracks = [white_track,None,black_track]
     
-    # some variables:
-    rolled = False
-    rolled_num = 0 # number rolled
-    turn = 0 # 0 = white 2= black
-    moved = True # did we move after roll ?
-setup()
-def rollicon(y): # needed only 0 or 2 | white or black
+    def_cv_pieces()
+    # roll icons
+    checkroll()
+    score()
+    # forfeit "button"
+    t = cv.create_text(90,770,text="forfeit move",font="Times 20 bold")
+    r = cv.create_text(350,770,text="reset",font="Times 20 bold")
+
+
+rollicons = []
+
+def rollicon(y): # 0 white , 2 black
     s = ""
+    if turn == 2:
+        dd = "-black"
+    else:
+        dd = "-white"
     if turn == y:
+        s+=dd
         if not rolled:
             s+="roll"
         else:
             s+= str(rolled_num)
-        if not moved:
-            s+="-active"
+#        if not moved:
+#            s+="-active"
     else:
         if rolled_num == 0:
             s = "0"
         else:
-            s+="wait"
-    print(f"turn: {turn},rolled_num {rolled_num},moved {moved}")
-    return s
+            s="wait"
+    s+=".gif"
+    pc = tk.PhotoImage(file=s)
+    pc = pc.subsample(2,2)
+    return pc
 
 def checkroll():
-# rolls
-    butts(5,0)
-    butts(5,2)
-# starting position
-    butts(4,0)
-    butts(4,2)
+    # 5,0 and 5,2 coords
+    global rollicons
+    global w ,b
+    global cv
 
-# coords of icons:
-def picbutton(x,y):
-    global pieces_coords
-    name = ""
-    wheel_icons = [[0,0],[0,2],[3,1],[6,0],[6,2]]
-    bars_icons = [[0,1]]
-    wave_icons = [[1,0],[1,2],[3,0],[3,2],[6,1]]
-    dots_icons = [[1,1],[2,0],[2,2],[4,1],[7,1]]
-    otherone_icons = [[2,1],[5,1]]
-    cuby_icons = [[7,0],[7,2]]
-    rolling_icons = [[5,0],[5,2]]
-    coords = [x,y]
-    if coords in wheel_icons:
-        name+="wheel"
-    elif coords in bars_icons:
-        name+="bars"
-    elif coords in dots_icons:
-        name+="dots"
-    elif coords in otherone_icons:
-        name+="otherone"
-    elif coords in cuby_icons:
-        name+="cuby"
-    elif coords in wave_icons:
-        name+="waves"
-    if coords in white_pieces_coords:
-        name+="-white"
-    elif coords in black_pieces_coords:
-        name+="-black"
-    if coords in rolling_icons:
-        name = rollicon(y)
-    if coords == [4,0] or coords == [4,2]:
-        if len(pieces_coords[y]) == 0:
-            name = "-empty-"
-    if name:
-        name+=".gif"
-    else:
-        pic= tk.PhotoImage(file="-empty-.gif")
-        pic = pic.subsample(2,2)
-        return pic
-#    print(name)
-    pic= tk.PhotoImage(file=name)
-    pic = pic.subsample(2,2)
-    return pic
+    global whiterollicon,blackrollicon
+    whiterollicon = rollicon(0)
+    blackrollicon = rollicon(2)
+    if len(rollicons) == 3:
+        cv.delete(rollicons[0])
+        cv.delete(rollicons[2])
+#        w = rollicons[0]
+#        b = rollicons[2]
+#        cv[w]["image"] = whiterollicon
+#        cv[b]["image"] = blackrollicon
+        print(f"rollicons = {rollicons}")
+#        cv.delete(w)
+#        cv.delete(b)
+#        tk.Canvas.itemconfig(w,100,493,image=whiterollicon)
+
+#        tk.Canvas.itemconfig(b,270,489,image=blackrollicon)
+#        cv.itemcomfigure(w,image = whiterollicon)
+#        cv.itemconfigure(b,image = blackrollicon)
+#    if len(rollicons) == 0:
+        # white
+#        [100,493,152,526,[5,0]], # roll white
+#        [73,433,152,526,[5,0]], # roll white
+    w = cv.create_image(100,480,image=whiterollicon)
+#        [270,489,338,560,[5,2]], # roll black
+#        [287,428,338,560,[5,2]], # roll black
+    b = cv.create_image(330,480,image=blackrollicon)
+
+#        print(cv.itemconfig(b))        
+    rollicons = [w,None,b]
+
+    
+def def_cv_pieces(delete=False):
+    global whitepic , blackpic
+    global cv
+    global white_cv
+    global black_cv
+    global pieces_cv
+    if delete:
+        for i in white_cv:
+            cv.delete(i)
+#
+        for i in black_cv:
+            cv.delete(i)
+        return
+
+    white_cv= []
+    black_cv = []
+    pieces_cv = []
+    whitepic = tk.PhotoImage(file="-white.gif")
+    whitepic = whitepic.subsample(2,2)
+    blackpic = tk.PhotoImage(file="-black.gif")
+    blackpic = blackpic.subsample(2,2)
+    ## check if there are no more cv objects
+    t = cv.create_image(-100,-100,image=whitepic)
+#    for i in range(2,t+1):
+#        cv.delete(i)
+    for i in white_pieces:
+        x,y = i[0],i[1]
+        for c in board_x_y:
+            if c[4] == [x,y]:
+                xx = int((c[2] + c[0]) /2)
+                yy = int((c[3] + c[1]) / 2)
+                s = cv.create_image(xx, yy, image=whitepic) 
+                white_cv.append(s)
+                print("white")
+
+    for i in black_pieces:
+        x,y = i[0],i[1]
+        for c in board_x_y:
+            if c[-1] == [x,y]:
+                xx = int((c[2] + c[0]) /2)
+                yy = int((c[3] + c[1]) / 2)
+                s = cv.create_image(xx, yy, image=blackpic) 
+                black_cv.append(s)
+                print("black")
+    pieces_cv = [white_cv,None,black_cv]
+    print(pieces_cv)
 
 def roll():
+    score()
     global rolled_num
-    global moved , rolled
-#    rolled_num = 0
-
+    global moved,rolled
     # check if game did not ended already
     for i in range(0,3,2):
-        if not pieces_coords[i]:
+        if not pieces[i]:
             game_ended(i)
             return
     if moved == False or rolled == True:
         return
     i = 0
     for a in range(4):
-        i += random.randint(0,1)
-#    print(i)
+        i+= random.randint(0,1)
     rolled_num = i
     moved = False
-#    if i == 0:
-#        moved = True
     rolled = True
     checkroll()
-    print(f"rolled_num {rolled_num}")
-    return i
 
 def game_ended(turn):
     if turn == 0:
@@ -167,19 +245,17 @@ def game_ended(turn):
     else:
         s = "black"
         opp = 0
-    t = f"{s} won  7 : {7 - len(pieces_coords[opp])}"
+    t = f"{s} won 7 : {7 - len(pieces[opp])}"
     showinfo("Window",t)
 
+
 def reset():
-    global white_pieces_coords,black_pieces_coords,pieces_coords
-    global rolled, rolled_num , turn, moved
     a = tk.messagebox.askokcancel("popup","reset?")
     if a:
+
+        def_cv_pieces(True)
         setup()
-        for x in range(8):
-            for y in range(3):
-                butts(x,y)
-        score()
+#        score()
 
 def endmove(playagain = False): # True == one more move
     global turn,rolled,moved
@@ -187,7 +263,6 @@ def endmove(playagain = False): # True == one more move
         opponent = 2
     else:
         opponent = 0
-
     if not playagain:
         turn = opponent
     rolled = False
@@ -196,26 +271,54 @@ def endmove(playagain = False): # True == one more move
         s = roll()
         if s == 0:
             endmove()
-
     checkroll()
 
-def play(x,y):
-    global white_pieces_coords
-    global black_pieces_coords
-    global pieces_coords , board_butts
-    global rolled_num , turn ,moved , rolled
+def coords(x,y):
 
-#    setup()
+    if 16 < x < 164:
+        if 753 < y < 776:
+            forfeit()
+            return
+    if 315 < x < 390:
+        if 757 < y < 779:
+            reset()
+            return
+    for item in board_x_y:
+        if item[0] <= x <= item[2]:
+            if item[1] <= y <= item[3]:
+                print(item[4])
+                play(item[4])
+#                movec(item[4])
+                return
+
+
+def getpossition(x,y):
+
+    for i in board_x_y:
+        if i[4] == [x,y]:
+            return i[0],i[1]
+
+def play(coords):
+#    global white_pieces
+#    global black_pieces
+#    global pieces, board_butts
+    global rolled_num , turn, moved, rolled
+    global tracks
+    global pieces_cv
+    global pieces
+    print(f"rolled_num = {rolled_num}")
+    print(f"turn = {turn}")
+    print(f"moved = {moved}")
+    print(f"rolled = {rolled}")
+    print(pieces)
     checkroll()
-    print(f"{x},{y} pressed\nturn {turn}\nrolled_num {rolled_num}")
-#    rolled_num = 0
-
-   # if rollbutton,roll
+    x = coords[0]
+    y = coords[1]
+    # if rollbutton ,rull
     if x == 5 and y == turn:
         if moved:
             roll()
-#        print(f"rolled_num {rolled_num}")
-        if rolled_num == 0:
+        if rolled_num ==0:
             if turn == 0:
                 turn = 2
             else:
@@ -223,198 +326,132 @@ def play(x,y):
             moved = True
             rolled = False
             checkroll()
+
             return
-        checkroll()
-        return
-    # elif moving pieces
-    elif [x,y] in pieces_coords[turn] and not moved:
+
+    if coords in pieces[turn] and not moved:
         if turn == 0:
             opponent = 2
         else:
             opponent = 0
-        # manipulate exact piece
-        pieceindex = pieces_coords[turn].index([x,y])
-        # position on table
-        tableindex = tracks[turn].index([x,y])
-
-        # work only with valid rolls
-        if rolled_num == 0:
+        trackindex = tracks[turn].index(coords) # position on board
+        print(f"trackindex = {trackindex}")
+        indpiece = pieces[turn].index(coords) # identify piece
+        print(f"indpiece = {indpiece}")
+        t = pieces_cv[turn][indpiece] # identify canvas of piece
+        print(f"t = {t}")
+        result = trackindex + rolled_num
+        print(result)
+        if len(tracks[turn]) < result:
             return
-        # if roll goes over, ignore
-        if rolled_num + tableindex > len(tracks[turn]):
-            return
-        # if roll is exact, remove piece
-        if rolled_num + tableindex == len(tracks[turn]):
-            del pieces_coords[turn][pieceindex]
-            print(f"pieces_coords[turn] == {pieces_coords[turn]}")
-            print(f"{pieces_coords[turn] == True}")
-
-            print(f"{pieces_coords[turn] == False}")
-            # update score
+        if len(tracks[turn]) == result:
+            pieces[turn].pop(indpiece)
+            pieces_cv[turn].pop(indpiece)
+            cv.delete(t)
             score()
-            if not pieces_coords[turn]:
+            if len(pieces[turn]) == 0:
                 game_ended(turn)
-            butts(x,y)
             endmove()
+
+            # next turn
             return
-        newx,newy = tracks[turn][rolled_num+tableindex]
+        coords_new = tracks[turn][trackindex+rolled_num]
+        newx = coords_new[0]
+        newy = coords_new[1]
+        print(f"coords_new = {coords_new}")
         # special case
         if [newx,newy] == [3,1] : # can't take piece there
-            if [newx,newy] in pieces_coords[opponent]: # go one step further
+            if [newx,newy] in pieces[opponent]:
                 newx+=1
-        if [newx,newy] in pieces_coords[turn]: # can't take own piece
+        if [newx,newy] in pieces[turn]: # can't take own piece
             return
-        pieces_coords[turn][pieceindex] = [newx,newy]
-        if [newx,newy] in pieces_coords[opponent]:
-            oppindex = pieces_coords[opponent].index([newx,newy])
-            pieces_coords[opponent][oppindex] = [4,opponent]
+        newcoordx,newcoordy = getpossition(newx,newy)
+        if [newx,newy] in pieces[opponent]: # take
+            oppindex = pieces[opponent].index([newx,newy])
+            oppx,oppy = getpossition(4,opponent)
+            difopx = oppx - newcoordx
+            difopy = oppy - newcoordy
+            taken = pieces_cv[opponent][oppindex]
+            cv.move(taken,difopx,difopy) # move to start
+            pieces[opponent][oppindex] = [4,opponent] # set coords
 
-        playagain =[ [0,0] , [0,2] , [3,1] ,[6,0] , [6,2] ] # "play again" squares
-        butts(x,y)
-        butts(newx,newy)
-        play = ( [newx,newy] in playagain )
+
+        print(f"{newcoordx},{newcoordy}")
+        oldx,oldy = getpossition(x,y)
+        difx = newcoordx - oldx
+        dify = newcoordy - oldy
+
+        cv.move(t,difx,dify)
+        pieces[turn][indpiece] = [newx,newy]
+        print("move!!")
+        print(f"{t},{difx},{dify}")
+        print(f"{pieces[turn][indpiece]}")
+        print(f"{pieces[turn]}")
+        # play again squares
+        playagain = [ [0,0] , [0,2] , [3,1], [6,0] ,[6,2]]
+        play =( [newx,newy] in playagain )
         endmove(play)
         return
-    return
+
 
 def is_move_possible():
-    a = pieces_coords[turn] # all pieces of player who's move it is 
+    a = pieces[turn] # all pieces of player on move
     road = tracks[turn]
     if turn == 0:
         opponent = 2
     else:
         opponent = 0
     alreadychecked = []
-#    print(f"checking {a}")
     for piece in a:
         if piece in alreadychecked:
             continue
-
-#        print(f"checking {piece} of {turn}")
-        # where is the piece
         piece_position = road.index(piece)
-        # move is not going way out of board
         if rolled_num + piece_position <= len(road):
             newcoords = road[piece_position+rolled_num]
-            if newcoords == [3,1]: # special square check
+            if newcoords == [3,1] : # special square check
                 if newcoords in pieces_coords[opponent]:
                     newcoords = [4,1]
-            # move wouldn't take own piece
             if newcoords not in a:
                 return True
         alreadychecked.append(piece)
     return False
 
-# not needed, just for debugging:
-#def printbuts():
-#
-#    for a in pieces_coords:
-#        print(a)
-####
-
-def butts(x,y):
-#    print(f"butts {x}{y}")
-    global board_butts
-    f,b,p = board_butts[x][y]
-    p = picbutton(x,y)
-    b["image"] = p
-    try:
-        board_butts[x][y] = f,b,p
-    except IndexError:
-        print(f"{x}{y}")
-        print(f"board_butts = {board_butts}")
-        raise IndexError
-
-def board():
-    for x in range(8):
-        for y in range(3):
-#            if (x == 4 or x == 5) and (y != 1):
-#                continue
-            if board_butts[x][y] == None:
-                f = tk.Frame(gf,width=60,height=60)
-                f.rowconfigure(0,weight=1)
-                f.columnconfigure(0,weight=1)
-                f.grid_propagate(0)
-                f.grid(row=x,column=y)
-#                b = tk.Button(f,picture=picture)
-                picture = picbutton(x,y)
-                b= ""
-#                print(b)
-                if picture:
-                    b = tk.Button(f,image=picture)
-                else:
-                    b = tk.Button(f,text="roll")
-                b["command"] = lambda *args,a=x,c=y: play(a,c)
-                b.pack()
-#                print(f"{x}{y}")
-                board_butts[x][y] = f,b,picture
-    # button for forfeit move
-    f = tk.Frame(gf,width = 120,height=60)
-    f.rowconfigure(0,weight=1)
-    f.columnconfigure(0,weight=1)
-    f.grid_propagate(0)
-    f.grid(row=8,column=0)
-    b = tk.Button(f,text="forfeit move",command = forfeit)
-    b.pack()
-    board_butts[8][0] = f,b
-    # button for reset
-    f = tk.Frame(gf,width = 120,height=60)
-    f.rowconfigure(0,weight=1)
-    f.columnconfigure(0,weight=1)
-    f.grid_propagate(0)
-    f.grid(row=8,column=2)
-    b = tk.Button(f,text="reset",command = reset)
-    b.pack()
-    board_butts[8][2] = f,b
-    # score button
-    score()
-
-def score():
-    w = str(7 - len(pieces_coords[0]))
-    b = str(7 - len(pieces_coords[2]))
-    string = f"score\n{w} : {b}"
-    global board_butts
-    if board_butts[8][1] == None:
-        # score :
-        f = tk.Frame(gf,width = 120,height= 60)
-        f.rowconfigure(0,weight = 1)
-        f.columnconfigure(0,weight=1)
-        f.grid_propagate(0)
-        f.grid(row=8,column=1)
-        b = tk.Button(f,text=string)
-        b.pack()
-        board_butts[8][1] = f,b
-    else: # update
-        f,b = board_butts[8][1]
-        b["text"] = string
-        board_butts[8][1] =f, b
-
 
 def forfeit():
-    global moved,rolled , turn
-    if not rolled:
-
-        tk.messagebox.askokcancel("popup","ROLL!")
-        return
+    global moved,rolled,turn
     # check if game did not ended already
     for i in range(0,3,2):
-        if not pieces_coords[i]:
+        if not pieces[i]:
             game_ended(i)
             return
+    if not rolled:
+        tk.messagebox.askokcancel("popup","ROLL!")
+        return
+
 
     if rolled and is_move_possible():
         tk.messagebox.askokcancel("popup","you can move!")
         return
     endmove()
-#    moved = True
-#    rolled = False
-#    if turn == 0:
-#        turn = 2
-#    else:
-#        turn = 0
-#    
-#    checkroll()
 
-board()
+
+scoretext = []
+def score():
+    global scoretext
+    w = str(7 - len(pieces[0]))
+    b = str(7 - len(pieces[2]))
+    t = f"{w} : {b}"
+
+    if len(scoretext) == 0:
+        score = cv.create_text(220,780,font="Times 30 italic bold",text=t)
+        scoretext.append(score)
+    else:
+        cv.itemconfig(scoretext[0],font="Times 30 italic bold",text=t)
+
+    # show canvas text :p
+    return
+
+# RUN!
+
+setup()
 game.mainloop()
-
