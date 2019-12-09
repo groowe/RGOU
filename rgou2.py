@@ -140,13 +140,15 @@ def checkroll():
     whiterollicon = rollicon(0)
     blackrollicon = rollicon(2)
     if len(rollicons) == 3:
-        w = rollicons[0]
-        b = rollicons[2]
+        cv.delete(rollicons[0])
+        cv.delete(rollicons[2])
+#        w = rollicons[0]
+#        b = rollicons[2]
 #        cv[w]["image"] = whiterollicon
 #        cv[b]["image"] = blackrollicon
         print(f"rollicons = {rollicons}")
-        cv.delete(w)
-        cv.delete(b)
+#        cv.delete(w)
+#        cv.delete(b)
 #        tk.Canvas.itemconfig(w,100,493,image=whiterollicon)
 
 #        tk.Canvas.itemconfig(b,270,489,image=blackrollicon)
@@ -174,7 +176,7 @@ def def_cv_pieces(delete=False):
     if delete:
         for i in white_cv:
             cv.delete(i)
-
+#
         for i in black_cv:
             cv.delete(i)
         return
