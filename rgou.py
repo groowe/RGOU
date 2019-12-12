@@ -101,7 +101,6 @@ def setup():
                [7,2],[6,2]]
     # common_track = [[1,0],[1,1],[1,2],[1,3],[1,4],[1,5],[1,6],[1,7]]
     tracks = [white_track,None,black_track]
-    
     def_cv_pieces()
     # roll icons
     checkroll()
@@ -109,7 +108,6 @@ def setup():
     # forfeit "button"
     t = cv.create_text(90,770,text="forfeit move",font="Times 20 bold")
     r = cv.create_text(350,770,text="reset",font="Times 20 bold")
-
 
 rollicons = []
 
@@ -142,7 +140,6 @@ def checkroll():
     global rollicons
     global w ,b
     global cv
-
     global whiterollicon,blackrollicon
     whiterollicon = rollicon(0)
     blackrollicon = rollicon(2)
@@ -276,7 +273,6 @@ def endmove(playagain = False): # True == one more move
     checkroll()
 
 def coords(x,y):
-
     if 16 < x < 164:
         if 753 < y < 776:
             forfeit()
@@ -295,7 +291,6 @@ def coords(x,y):
 
 
 def getpossition(x,y):
-
     for i in board_x_y:
         if i[4] == [x,y]:
             return i[0],i[1]
@@ -395,7 +390,6 @@ def play(coords):
         endmove(play)
         return
 
-
 def is_move_possible():
     a = pieces[turn] # all pieces of player on move
     road = tracks[turn]
@@ -418,7 +412,6 @@ def is_move_possible():
         alreadychecked.append(piece)
     return False
 
-
 def forfeit():
     global moved,rolled,turn
     # check if game did not ended already
@@ -429,7 +422,6 @@ def forfeit():
     if not rolled:
         tk.messagebox.askokcancel("popup","ROLL!")
         return
-
 
     if rolled and is_move_possible():
         tk.messagebox.askokcancel("popup","you can move!")
