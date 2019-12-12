@@ -26,7 +26,9 @@ def callback(event):
 game = tk.Tk()
 game.title("Royal Game of Ur")
 ## BG image
-fname = "RGOU.gif"
+#fname = "RGOU.gif"
+#fname = "RGOU2.gif"
+fname = "RGOU4.gif"
 bg_image = tk.PhotoImage(file=fname)
 bg_image = bg_image.subsample(2,2)
 w = bg_image.width()
